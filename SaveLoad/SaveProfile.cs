@@ -1,6 +1,6 @@
 using System;
 
-namespace Gamekit2D.Runtime.Utils.SaveLoad
+namespace CustomSaveLoad
 {
     [Serializable]
     public sealed class SaveProfile<T> where T : SaveProfileData

@@ -1,11 +1,11 @@
 using System.IO;
 using System.Threading.Tasks;
-using Gamekit2D.Runtime.Utils.Progress;
+using CustomSaveLoad.Utils;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Gamekit2D.Runtime.Utils.SaveLoad
+namespace CustomSaveLoad
 {
     [UsedImplicitly]
     public static class SaveManager
@@ -20,7 +20,6 @@ namespace Gamekit2D.Runtime.Utils.SaveLoad
         // ReSharper disable once UnusedMember.Global
         public static async Task DeleteSaveAsync(string profileName)
         {
-            LoadingManager.Show(0, 2);
             await Task.Run(() =>
             {
                 //check if the file exists
@@ -29,12 +28,9 @@ namespace Gamekit2D.Runtime.Utils.SaveLoad
                     Task.FromException(new Exception(
                         $"Save file: {profileName} not found. Make sure you've saved the file before accessing it, and the profileName is correct."));
                 }
-                LoadingManager.Report(1);
                 //remove the file
                 File.Delete($"{saveFolder}/{profileName}");
-                LoadingManager.Report(2);
             });
-            LoadingManager.Hide();
         }
 
         /// <summary>
@@ -66,7 +62,6 @@ namespace Gamekit2D.Runtime.Utils.SaveLoad
         public static async Task<SaveProfile<T>> LoadAsAsync<T>(string profileName, bool encryptionEnabled = true)
             where T : SaveProfileData
         {
-            LoadingManager.Show(0, 3);
             var output = await Task.Run(() =>
             {
                 //check if file exists
@@ -74,18 +69,14 @@ namespace Gamekit2D.Runtime.Utils.SaveLoad
                     Task.FromException(
                         new Exception(
                             $"Save file: {profileName} not found. Make sure you've saved the file before accessing it, and the profileName is correct."));
-                LoadingManager.Report(1);
                 // Read the entire file and save its contents.
                 var fileContents = File.ReadAllText($"{saveFolder}/{profileName}"); //encrypted
-                LoadingManager.Report(2);
                 if (encryptionEnabled)
                     fileContents = AesOperation.DecryptString(key, fileContents); //decrypted
-                LoadingManager.Report(3);
                 // Deserialize the JSON data 
                 Debug.Log("Successfully loaded data");
                 return JsonConvert.DeserializeObject<SaveProfile<T>>(fileContents);
             });
-            LoadingManager.Hide();
             return output;
         }
 
@@ -124,31 +115,24 @@ namespace Gamekit2D.Runtime.Utils.SaveLoad
         internal static async Task SaveAsAsync<T>(SaveProfile<T> save, bool overwrite = false, bool encryptionEnabled = true)
             where T : SaveProfileData
         {
-            LoadingManager.Show(0, 6);
             await Task.Run(() =>
             {
                 try
                 {
-                    LoadingManager.Report(1);
                     if (!overwrite && File.Exists($"{saveFolder}/{save.name}"))
                         throw new Exception(
                             $"Save file: {save.name} already exists, please use a different save profile name.");
-                    LoadingManager.Report(2);
                     //Serialize the object into JSON and save string.
                     var jsonString = JsonConvert.SerializeObject(save, Formatting.Indented,
                         new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore });
-                    LoadingManager.Report(3);
                     //encrypt the plain text string using Aes and our symmetric key
                     if (encryptionEnabled)
                         jsonString = AesOperation.EncryptString(key, jsonString);
-                    LoadingManager.Report(4);
                     // Write JSON to file.
                     if (!Directory.Exists(saveFolder)) //create the saves folder if we don't already have it!
                         Directory.CreateDirectory(saveFolder);
-                    LoadingManager.Report(5);
                     //write the encrypted text into the file
                     File.WriteAllText($"{saveFolder}/{save.name}", jsonString);
-                    LoadingManager.Report(6);
 #if UNITY_EDITOR
                     Debug.Log($"Successfully saved data into: {saveFolder}/{save.name}");
 #endif
@@ -160,7 +144,6 @@ namespace Gamekit2D.Runtime.Utils.SaveLoad
 #endif
                 }
             });
-            LoadingManager.Hide();
         }
 
         /// <summary>

@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Gamekit2D.Runtime.Utils.SaveLoad
+namespace CustomSaveLoad.Utils
 {
     /// <summary>
     /// Handles encryption and decryption
