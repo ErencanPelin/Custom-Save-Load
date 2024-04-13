@@ -1,0 +1,23 @@
+{
+  "name": "com.eren.custom-save-load",
+  "version": "1.0.0",
+  "displayName": "Custom Save Load",
+  "description": "A custom saving and loading handler that can be reused for any project, using JSON and encrypted files",
+  "unity": "2022.3",
+  "unityRelease": "24f1",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.2",
+    "com.unity.mathematics": "1.2.6",
+    "nuget.castle-core": "1.0.1",
+    "com.unity.moq": "1.0.0"
+  },
+  "keywords": [
+    "save",
+    "load",
+  ],
+  "author": {
+    "name": "Erencan Pelin",
+    "email": "erenp.business@gmail.com",
+    "url": "https://github.com/ErencanPelin"
+  }
+}
